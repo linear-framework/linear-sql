@@ -9,7 +9,7 @@ import javax.sql.DataSource
 object Database {
 
   /**
-    * Creates a Sprout Database over the given JDBC DataSource.
+    * Creates a Linear Database over the given JDBC DataSource.
     */
   def apply(ds: DataSource): Database = new Database {
     override protected val dataSource: DataSource = ds

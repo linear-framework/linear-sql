@@ -6,10 +6,10 @@ import javax.sql.DataSource
 trait MySqlDataSource extends BaseSpec {
   override protected val dataSource: DataSource = {
     basicDataSource(
-      url = "jdbc:mariadb://localhost:3310/sprout_sql_test",
+      url = "jdbc:mariadb://localhost:3310/linear_sql_test",
       driver = "org.mariadb.jdbc.Driver",
-      username = "sprout_user",
-      password = "sprout_password"
+      username = "linear_user",
+      password = "linear_password"
     )
   }
 }
