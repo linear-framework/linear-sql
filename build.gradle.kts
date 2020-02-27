@@ -1,7 +1,11 @@
 plugins {
   `java-library`
   scala
+  `maven-publish`
 }
+
+group = "com.linearframework"
+version = "0.1.1-SNAPSHOT"
 
 repositories {
   jcenter()
@@ -26,4 +30,23 @@ dependencies {
 tasks.named<Jar>("jar") {
   from(sourceSets["main"].output)
   from(sourceSets["main"].allSource)
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "LinearSql"
+      url = uri("https://maven.pkg.github.com/linear-framework/linear-sql")
+      credentials {
+        username = System.getenv("GITHUB_USER")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
+  publications {
+    create<MavenPublication>("PublishToGithub") {
+      artifactId = "sql"
+      from(components["java"])
+    }
+  }
 }
