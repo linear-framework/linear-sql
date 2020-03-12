@@ -4,7 +4,7 @@ import java.io.{InputStream, Reader}
 import java.lang
 import java.net.URL
 import java.sql.{Blob, Clob}
-import java.time.{LocalDate, LocalDateTime, LocalTime}
+import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset, ZonedDateTime}
 
 /**
   * Fetches data from an underlying [[java.sql.ResultSet]]
@@ -42,6 +42,7 @@ class Row private[sql](private val inner: java.sql.ResultSet) {
   def getDateOption(columnIndex: Int): Option[LocalDate] = option(inner.getDate(columnIndex)).map(_.toLocalDate)
   def getTimeOption(columnIndex: Int): Option[LocalTime] = option(inner.getTime(columnIndex)).map(_.toLocalTime)
   def getTimestampOption(columnIndex: Int): Option[LocalDateTime] = option(inner.getTimestamp(columnIndex)).map(_.toLocalDateTime)
+  def getZonedTimestampOption(columnIndex: Int): Option[ZonedDateTime] = option(inner.getTimestamp(columnIndex)).map(_.toLocalDateTime.atZone(ZoneOffset.UTC))
   def getAsciiStreamOption(columnIndex: Int): Option[InputStream] = option(inner.getAsciiStream(columnIndex))
   def getBinaryStreamOption(columnIndex: Int): Option[InputStream] = option(inner.getBinaryStream(columnIndex))
   def getCharacterStreamOption(columnIndex: Int): Option[Reader] = option(inner.getCharacterStream(columnIndex))
@@ -62,6 +63,7 @@ class Row private[sql](private val inner: java.sql.ResultSet) {
   def getDateOption(columnLabel: String): Option[LocalDate] = option(inner.getDate(columnLabel)).map(_.toLocalDate)
   def getTimeOption(columnLabel: String): Option[LocalTime] = option(inner.getTime(columnLabel)).map(_.toLocalTime)
   def getTimestampOption(columnLabel: String): Option[LocalDateTime] = option(inner.getTimestamp(columnLabel)).map(_.toLocalDateTime)
+  def getZonedTimestampOption(columnLabel: String): Option[ZonedDateTime] = option(inner.getTimestamp(columnLabel)).map(_.toLocalDateTime.atZone(ZoneOffset.UTC))
   def getAsciiStreamOption(columnLabel: String): Option[InputStream] = option(inner.getAsciiStream(columnLabel))
   def getBinaryStreamOption(columnLabel: String): Option[InputStream] = option(inner.getBinaryStream(columnLabel))
   def getCharacterStreamOption(columnLabel: String): Option[Reader] = option(inner.getCharacterStream(columnLabel))
@@ -138,6 +140,7 @@ class Row private[sql](private val inner: java.sql.ResultSet) {
   def getDate(columnIndex: Int): LocalDate = unbox(getDateOption(columnIndex))
   def getTime(columnIndex: Int): LocalTime = unbox(getTimeOption(columnIndex))
   def getTimestamp(columnIndex: Int): LocalDateTime = unbox(getTimestampOption(columnIndex))
+  def getZonedTimestamp(columnIndex: Int): ZonedDateTime = unbox(getZonedTimestampOption(columnIndex))
   def getAsciiStream(columnIndex: Int): InputStream = unbox(getAsciiStreamOption(columnIndex))
   def getBinaryStream(columnIndex: Int): InputStream = unbox(getBinaryStreamOption(columnIndex))
   def getCharacterStream(columnIndex: Int): Reader = unbox(getCharacterStreamOption(columnIndex))
@@ -214,6 +217,7 @@ class Row private[sql](private val inner: java.sql.ResultSet) {
   def getDate(columnLabel: String): LocalDate = unbox(getDateOption(columnLabel))
   def getTime(columnLabel: String): LocalTime = unbox(getTimeOption(columnLabel))
   def getTimestamp(columnLabel: String): LocalDateTime = unbox(getTimestampOption(columnLabel))
+  def getZonedTimestamp(columnLabel: String): ZonedDateTime = unbox(getZonedTimestampOption(columnLabel))
   def getAsciiStream(columnLabel: String): InputStream = unbox(getAsciiStreamOption(columnLabel))
   def getBinaryStream(columnLabel: String): InputStream = unbox(getBinaryStreamOption(columnLabel))
   def getCharacterStream(columnLabel: String): Reader = unbox(getCharacterStreamOption(columnLabel))

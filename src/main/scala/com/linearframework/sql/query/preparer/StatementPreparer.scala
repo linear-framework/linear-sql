@@ -1,8 +1,8 @@
 package com.linearframework.sql.query.preparer
 
 import com.linearframework.sql.DatabaseException
-import java.sql.{Blob, Clob, Connection, Date, PreparedStatement, Time, Timestamp}
-import java.time.{LocalDate, LocalDateTime}
+import java.sql._
+import java.time.{LocalDate, LocalDateTime, ZonedDateTime}
 import java.util
 
 private[sql] trait StatementPreparer {
@@ -56,6 +56,7 @@ private[sql] trait StatementPreparer {
         case v: Time => stmt.setTime(position, v)
         case v: java.util.Date => stmt.setTimestamp(position, new Timestamp(v.getTime))
         case v: LocalDateTime => stmt.setTimestamp(position, Timestamp.valueOf(v))
+        case v: ZonedDateTime => stmt.setTimestamp(position, Timestamp.valueOf(v.toLocalDateTime))
 
         case v: Clob => stmt.setClob(position, v)
         case v: Blob => stmt.setBlob(position, v)
