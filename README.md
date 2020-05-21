@@ -7,7 +7,11 @@ It is **NOT** an ORM or a SQL builder, nor does it attempt to be.
 
 ### Quick Demo
 ```scala
-db.sql(p"INSERT INTO persons(first_name, last_name) VALUES ($first, $last)").execute()
+db.sql(p"""
+    INSERT INTO persons (first_name, last_name)
+    VALUES ($first, $last)
+  """)
+  .execute()
 ```
 
 ### DataSource Configuration
