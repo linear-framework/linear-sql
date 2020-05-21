@@ -7,18 +7,12 @@ It is **NOT** an ORM or a SQL builder, nor does it attempt to be.
 
 ### Quick Demo
 ```scala
-import com.linearframework.sql._
-
 val db = Database(jdbcDataSource)
 
-db.sql("""
+db.sql(p"""
     INSERT INTO persons (first_name, last_name)
-    VALUES ({first}, {last})
+    VALUES ($first, $last)
   """)
-  .params(
-    "first" -> "Bill",
-    "last" -> "Gates"
-  )
   .execute()
 ```
 
@@ -58,17 +52,35 @@ db.sql("""
   .execute()
 ```
 
+### String Interpolation for Parameterized Queries
+Instead of calling `.params()` you can instead mix-in the `ParameterizedSql` trait and use interpolated strings.
+
+Interpolated strings are created with `parameterized""`, or more simply, `p""`:
+```scala
+import com.linearframework.sql._
+
+object PersonRepository extends ParameterizedSql {
+  val db: Database = Database(...)
+
+  /** Creates a person record, returning the generated person ID */
+  def create(firstName: String, lastName: String): Long = {
+    db.sql(p"""
+        INSERT INTO persons(first, last)
+        VALUES ($firstName, $lastName) 
+      """)
+      .returningKey(_.getLong("person_id"))
+      .execute()
+  }
+}
+```
+
 ### Insert and return the generated ID
 ```scala
 val id: Long =
-  db.sql("""
+  db.sql(p"""
       INSERT INTO persons (first_name, last_name)
-      VALUES ({first}, {last})
+      VALUES ($first, $last)
     """)
-    .params(
-      "first" -> "Bill",
-      "last" -> "Gates"
-    )
     .returningKey(_.getLong("person_id"))
     .execute()
 ```
@@ -91,14 +103,11 @@ val ids: Seq[Long] =
 ### Select one record
 ```scala
 val name: Option[(String, String)] =
-  db.sql("""
+  db.sql(p"""
       SELECT first_name, last_name
       FROM persons
-      WHERE person_id = {id}
+      WHERE person_id = $id
     """)
-    .params(
-      "id" -> 1L
-    )
     .returningRecord { rs =>
       (rs.getString("first_name"), rs.getString("last_name"))
     }
@@ -108,14 +117,11 @@ val name: Option[(String, String)] =
 ### Select multiple records
 ```scala
 val steves: Seq[String] =
-  db.sql("""
+  db.sql(p"""
       SELECT last_name
       FROM persons
-      WHERE first_name = {name}
+      WHERE first_name = $name
     """)
-    .params(
-      "name" -> "Steve"
-    )
     .returningRecords(_.getString("last_name"))
     .execute()
 ```
@@ -137,26 +143,18 @@ val petId: Long =
   db.transaction { tx =>
   
     val personId =
-      tx.sql("""
+      tx.sql(p"""
           INSERT INTO persons (first_name, last_name)
-          VALUES ({first}, {last})
+          VALUES ($first, $last)
         """)
-        .params(
-          "first" -> "Bill",
-          "last" -> "Gates"
-        )
         .returningKey(_.getLong("person_id"))
         .execute()
 
     val petId =
-      tx.sql("""
+      tx.sql(p"""
           INSERT INTO pets (person_id, name)
-          VALUES ({personId}, {name})
+          VALUES ($personId, $petName)
         """)
-        .params(
-          "personId" -> personId,
-          "name" -> "Clippy"
-        )
         .returningKey(_.getLong("pet_id"))
         .execute()
 

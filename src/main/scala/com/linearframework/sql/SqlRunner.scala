@@ -12,4 +12,9 @@ trait SqlRunner {
     */
   def sql(sql: String): QueryBuilder
 
+  /**
+    * Builds an executable SQL query
+    */
+  def sql(sqlAndParams: (String, List[(String, Any)])): QueryBuilder
+
 }

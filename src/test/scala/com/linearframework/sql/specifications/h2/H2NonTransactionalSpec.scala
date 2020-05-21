@@ -1,10 +1,10 @@
 package com.linearframework.sql.specifications.h2
 
 import com.linearframework.BaseSpec
-import com.linearframework.sql.DatabaseException
 import com.linearframework.sql.datasources.H2DataSource
+import com.linearframework.sql.{DatabaseException, ParameterizedSql}
 
-class H2NonTransactionalSpec extends BaseSpec with H2DataSource {
+class H2NonTransactionalSpec extends BaseSpec with H2DataSource with ParameterizedSql {
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -24,6 +24,16 @@ class H2NonTransactionalSpec extends BaseSpec with H2DataSource {
         .returningKey(_.getLong("id"))
         .execute()
 
+    (id > 0L) should be(true)
+  }
+
+  it should "support parameterized interpolated strings" in {
+    val name = "Billy"
+    val age = 33
+    val id =
+      db.sql(p"INSERT INTO persons(name, age) VALUES ($name, $age)")
+        .returningKey(_.getLong("id"))
+        .execute()
     (id > 0L) should be(true)
   }
 
@@ -90,10 +100,10 @@ class H2NonTransactionalSpec extends BaseSpec with H2DataSource {
   }
 
   it should "return None when a record could not be found" in {
+    val names = List("Donald", "George")
     val person =
       db
-        .sql("SELECT * FROM persons WHERE name IN({names})")
-        .params("names" -> List("Donald", "George"))
+        .sql(p"SELECT * FROM persons WHERE name IN($names)")
         .returningRecord(_.getString("name"))
         .execute()
 

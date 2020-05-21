@@ -33,4 +33,11 @@ trait Database extends SqlRunner with Transactional {
     QueryBuilder(query)
   }
 
+  /**
+    * Builds a non-transactional query
+    */
+  override def sql(sqlAndParams: (String, List[(String, Any)])): QueryBuilder = {
+    val query = new Query(sqlAndParams._1, isTransactional = false, openConnection(), params = List(sqlAndParams._2))
+    QueryBuilder(query)
+  }
 }

@@ -14,6 +14,11 @@ trait Transaction extends SqlRunner with Committable[Unit] {
   override def sql(query: String): QueryBuilder
 
   /**
+    * Builds a transactional query
+    */
+  override def sql(sqlAndParams: (String, List[(String, Any)])): QueryBuilder
+
+  /**
     * Whether or not this transaction is closed (i.e., it has already been committed or rolled back,
     * or the underlying connection is closed)
     */
@@ -52,6 +57,14 @@ private[sql] object Transaction {
         throw new DatabaseException("Transaction is closed")
       }
       val query = new Query(sql, isTransactional = true, connection)
+      QueryBuilder(query)
+    }
+
+    override def sql(sqlAndParams: (String, List[(String, Any)])): QueryBuilder = {
+      if (isClosed) {
+        throw new DatabaseException("Transaction is closed")
+      }
+      val query = new Query(sqlAndParams._1, isTransactional = true, connection, params = List(sqlAndParams._2))
       QueryBuilder(query)
     }
 
