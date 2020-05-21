@@ -42,7 +42,7 @@ private[sql] class Query private[sql](
       map(rs)
     }
     catch {
-      case e: SQLException => throw new DatabaseException(e)
+      case e: SQLException => throw new DatabaseException(cause = e)
     }
     finally {
       close(rs)
@@ -78,7 +78,7 @@ private[sql] class Query private[sql](
       map(rs)
     }
     catch {
-      case e: SQLException => throw new DatabaseException(e)
+      case e: SQLException => throw new DatabaseException(cause = e)
     }
     finally {
       close(rs)

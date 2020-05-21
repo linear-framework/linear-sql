@@ -25,7 +25,7 @@ trait Transactional {
         if (transaction != null && !transaction.isClosed) {
           transaction.rollback()
         }
-        throw new DatabaseException(e)
+        throw new DatabaseException(cause = e)
       case t: Throwable =>
         if (transaction != null && !transaction.isClosed) {
           transaction.rollback()
@@ -58,7 +58,7 @@ trait Transactional {
       dataSource.getConnection()
     }
     catch {
-      case e: SQLException => throw new DatabaseException(e)
+      case e: SQLException => throw new DatabaseException(cause = e)
     }
   }
 }
