@@ -12,7 +12,7 @@ class PgTransactionalSpec extends BaseSpec with PostgresDataSource {
     execute("DROP TABLE IF EXISTS persons;")
     execute("DROP TABLE IF EXISTS pets;")
     execute("CREATE TABLE IF NOT EXISTS persons(id BIGSERIAL, enabled BOOLEAN, fname VARCHAR(255));")
-    execute("CREATE TABLE IF NOT EXISTS pets(person_id BIGINT, name VARCHAR(255));")
+    execute("CREATE TABLE IF NOT EXISTS pets(id BIGSERIAL, person_id BIGINT, name VARCHAR(255));")
   }
 
   override def afterEach(): Unit = {
@@ -22,31 +22,39 @@ class PgTransactionalSpec extends BaseSpec with PostgresDataSource {
   }
 
   "A PostgreSQL transaction" can "commit multiple queries" in {
-    db.transaction(tx => {
-      val billyId =
-        tx.sql("INSERT INTO persons(fname, enabled) VALUES ({name}, {enabled})")
-          .params("name" -> "Billy", "enabled" -> true)
-          .returningKey(_.getLong("id"))
-          .execute()
+    val id =
+      db.transaction(tx => {
+        val billyId =
+          tx.sql("INSERT INTO persons(fname, enabled) VALUES ({name}, {enabled})")
+            .params("name" -> "Billy", "enabled" -> true)
+            .returningKey(_.getLong("id"))
+            .execute()
 
-      tx.sql("INSERT INTO pets(person_id, name) VALUES({id}, {name})")
-        .params("id" -> billyId, "name" -> "Rover")
-        .execute()
+        val petId =
+          tx.sql("INSERT INTO pets(person_id, name) VALUES({id}, {name})")
+            .params("id" -> billyId, "name" -> "Rover")
+            .returningKey(_.getLong("id"))
+            .execute()
 
-      tx.commit()
-    })
+        tx.returning(petId).commit()
+      })
 
     val personId = execute("SELECT id FROM persons", rs => {
       rs.next()
       rs.getLong("id")
     })
-    val petId = execute("SELECT person_id FROM pets", rs => {
+    val petPersonId = execute("SELECT person_id FROM pets", rs => {
       rs.next()
       rs.getLong("person_id")
     })
+    val petId = execute("SELECT id FROM pets", rs => {
+      rs.next()
+      rs.getLong("id")
+    })
 
     personId > 0 should be(true)
-    personId should be(petId)
+    personId should be(petPersonId)
+    petId should be (id)
   }
 
   it can "rollback queries in the transaction" in {

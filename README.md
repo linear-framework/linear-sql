@@ -130,6 +130,8 @@ You must explicitly call `commit()` to commit a transaction.
 Transactions will be automatically rolled back if `commit()` is missing, or if an exception is thrown
 before `commit()` could be reached.
 
+Optionally, `returning()` may be called prior to `commit()` to specify a value to return on a successful commit.
+
 ```scala
 val petId: Long =
   db.transaction { tx =>
@@ -158,7 +160,6 @@ val petId: Long =
         .returningKey(_.getLong("pet_id"))
         .execute()
 
-    tx.commit()
-    petId
+    tx.returning(petId).commit()
   }
 ```

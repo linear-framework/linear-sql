@@ -6,7 +6,7 @@ import java.sql.{Connection, SQLException}
 /**
   * A transactional [[com.linearframework.sql.SqlRunner]]
   */
-trait Transaction extends SqlRunner with Committable {
+trait Transaction extends SqlRunner with Committable[Unit] {
 
   /**
     * Builds a transactional query
@@ -18,6 +18,11 @@ trait Transaction extends SqlRunner with Committable {
     * or the underlying connection is closed)
     */
   override def isClosed: Boolean
+
+  /**
+    * Sets the value that this transaction should return upon commit.
+    */
+  def returning[T](value: T): Committable[T]
 
   /**
     * Commits this transaction
@@ -52,6 +57,15 @@ private[sql] object Transaction {
 
     override def isClosed: Boolean = {
       isCommitted || isRolledBack || connection.isClosed
+    }
+
+    override def returning[T](value: T): Committable[T] = {
+      val parent = this
+      new Committable[T] {
+        override def isClosed: Boolean = parent.isClosed
+        override def commit(): T = { parent.commit(); value }
+        override def rollback(): Unit = parent.rollback()
+      }
     }
 
     override def commit(): Unit = {

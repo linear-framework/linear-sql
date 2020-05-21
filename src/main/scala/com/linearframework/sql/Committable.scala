@@ -3,7 +3,7 @@ package com.linearframework.sql
 /**
  * An interaction with commit/rollback capabilities
  */
-trait Committable {
+trait Committable[T] {
 
   /**
     * Whether or not this interaction is closed (i.e., it has already been committed or rolled back,
@@ -14,7 +14,7 @@ trait Committable {
   /**
     * Commits this interaction
     */
-  def commit(): Unit
+  def commit(): T
 
   /**
     * Rolls back this interaction
