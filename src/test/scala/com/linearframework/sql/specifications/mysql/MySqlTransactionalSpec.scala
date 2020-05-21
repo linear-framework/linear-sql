@@ -21,7 +21,7 @@ class MySqlTransactionalSpec extends BaseSpec with MySqlDataSource {
     execute("DROP TABLE IF EXISTS pets;")
   }
 
-  "A Scrappy MySQL transaction" can "commit multiple queries" in {
+  "A MySQL transaction" can "commit multiple queries" in {
     db.transaction(tx => {
       val billyId =
         tx.sql("INSERT INTO persons(fname, enabled) VALUES ({name}, {enabled})")

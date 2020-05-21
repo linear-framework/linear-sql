@@ -21,7 +21,7 @@ class PgTransactionalSpec extends BaseSpec with PostgresDataSource {
     execute("DROP TABLE IF EXISTS pets;")
   }
 
-  "A Scrappy PostgreSQL transaction" can "commit multiple queries" in {
+  "A PostgreSQL transaction" can "commit multiple queries" in {
     db.transaction(tx => {
       val billyId =
         tx.sql("INSERT INTO persons(fname, enabled) VALUES ({name}, {enabled})")

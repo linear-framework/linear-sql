@@ -19,7 +19,7 @@ class MySqlNonTransactionalSpec extends BaseSpec with MySqlDataSource {
     execute("DROP TABLE IF EXISTS persons;")
   }
 
-  "A Scrappy MySQL DataSource" can "create a record returning its auto-generated key" in {
+  "A MySQL DataSource" can "create a record returning its auto-generated key" in {
     val id =
       db.sql("INSERT INTO persons(name, age) VALUES ({name}, {age})")
         .params("name" -> "Billy", "age" -> 33)

@@ -19,7 +19,7 @@ class H2TransactionalSpec extends BaseSpec with H2DataSource {
     execute("DROP TABLE IF EXISTS pets;")
   }
 
-  "A Scrappy H2 transaction" can "commit multiple queries" in {
+  "A H2 transaction" can "commit multiple queries" in {
     db.transaction(tx => {
       val billyId =
         tx.sql("INSERT INTO persons(fname, enabled) VALUES ({name}, {enabled})")

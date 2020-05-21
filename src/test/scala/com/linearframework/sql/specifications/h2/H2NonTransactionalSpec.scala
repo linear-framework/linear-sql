@@ -17,7 +17,7 @@ class H2NonTransactionalSpec extends BaseSpec with H2DataSource {
     execute("DROP TABLE IF EXISTS persons;")
   }
 
-  "A Scrappy H2 DataSource" can "create a record returning its auto-generated key" in {
+  "A H2 DataSource" can "create a record returning its auto-generated key" in {
     val id =
       db.sql("INSERT INTO persons(name, age) VALUES ({name}, {age})")
         .params("name" -> "Billy", "age" -> 33)
